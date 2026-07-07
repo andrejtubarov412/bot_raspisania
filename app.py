@@ -196,8 +196,11 @@ def view_hours():
         return redirect(url_for('login'))
     
     if user['role'] == 'admin':
-        hours = db.get_hours()
-        return render_template('hours.html', hours=hours, user=user, is_admin=True)
+        start, end = get_last_week_range()
+        hours = db.get_hours_last_week()
+        return render_template('hours.html', hours=hours, user=user, is_admin=True,
+                               week_start=start.strftime('%d.%m.%Y'),
+                               week_end=end.strftime('%d.%m.%Y'))
     else:
         hours = db.get_hours_for_user_last_week(user['id'])
         start, end = get_last_week_range()

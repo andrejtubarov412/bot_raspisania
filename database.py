@@ -169,6 +169,15 @@ class Database:
         self.c.execute('SELECT a.full_name, SUM(h.hours) FROM hours h JOIN accounts a ON h.account_id = a.id GROUP BY a.full_name ORDER BY SUM(h.hours) DESC')
         return self.c.fetchall()
 
+
+    def get_hours_last_week(self):
+        today = datetime.now().date()
+        monday = today - timedelta(days=today.weekday())
+        start = monday - timedelta(days=7)
+        end = monday - timedelta(days=1)
+        self.c.execute('''SELECT a.full_name, SUM(h.hours) FROM hours h JOIN accounts a ON h.account_id=a.id WHERE h.date BETWEEN ? AND ? GROUP BY a.full_name ORDER BY SUM(h.hours) DESC''',(start.strftime('%Y-%m-%d'),end.strftime('%Y-%m-%d')))
+        return self.c.fetchall()
+
     # ---- НОВЫЙ МЕТОД ДЛЯ СОТРУДНИКА ----
     def get_hours_for_user_last_week(self, account_id):
         """Возвращает часы сотрудника за прошлую неделю (пн–вс)"""
